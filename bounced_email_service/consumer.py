@@ -1,15 +1,20 @@
 # -*- coding: utf-8 -*-
 import pika
+from pprint import pprint
 
 
 class Consumer(object):
     def __init__(self, settings, handler):
+        self.settings = settings
         self.amqp_config = settings.config[settings.env]['amqp']
         self.handler = handler
 
-    def callback(self, ch, method, properties, body):
-        if self.handler.check_message(body):
-            ch.basic_ack(delivery_tag=method.delivery_tag)
+    def _log(self, obj):
+        if self.settings.debug:
+            pprint(obj)
+
+    def _callback(self, ch, method, properties, body):
+        ch.basic_ack(delivery_tag = method.delivery_tag)
         self.handler.handle_message(body)
 
     def run(self):
@@ -19,11 +24,7 @@ class Consumer(object):
         self.connection = pika.BlockingConnection(params)
 
         channel = self.connection.channel()
-        channel.basic_consume(
-            self.callback, 
-            queue=self.amqp_config['queue'], 
-            no_ack=self.amqp_config['no_ack'])
-
+        channel.basic_consume(self._callback, queue=self.amqp_config['queue'])
         channel.start_consuming()
 
     def stop(self):
