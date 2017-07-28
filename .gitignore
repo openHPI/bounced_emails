@@ -1,0 +1,6 @@
+tests
+.vagrant
+.vscode
+*egg-info
+*.log
+*__pycache__

@@ -1,0 +1,12 @@
+[Unit]
+Description=Bounced Email Service
+After=multi-user.target
+
+[Service]
+Type=idle
+Environment=LC_ALL=C.UTF-8
+Environment=LANG=C.UTF-8
+ExecStart=/usr/local/bin/bouncedemails run
+
+[Install]
+WantedBy=multi-user.target
