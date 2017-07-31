@@ -18,9 +18,9 @@ production:
     temporary_threshold: 3
     domains:
       opensap.info:
-        endpoint: http://open.hpi.de/account/stop-notification
+        endpoint: http://10.210.0.30:7001/stop-notification
       openhpi.de:
-        endpoint: http://opensap.info/account/stop-notification
+        endpoint: http://10.210.0.32:7001/stop-notification
   amqp:
-    url: amqp://mwiesner:geheim@10.210.0.30/%2f
+    url: amqp://bouncedemails:h6kPPxkhZ3PVxSGUtr2H@10.210.0.30/%2f
     queue: bouncedemails

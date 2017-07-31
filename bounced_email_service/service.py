@@ -17,7 +17,7 @@ class BouncedEmailSettings(object):
 
 
 @click.group()
-@click.option('--env', default='develop', help='environment')
+@click.option('--env', default='production', help='environment')
 @click.option('--debug/--no-debug', default=False)
 @click.pass_context
 def cli(ctx, env, debug):

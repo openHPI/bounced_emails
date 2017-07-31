@@ -9,6 +9,7 @@ __Bounced Email Handler__ separates incoming bounced emails in _temporary_ failu
 	- _Permanent_ failure: The accused email address in the bounced email is reported to the xikolo-account service. The xikolo-account service disables all notifications regarding this email address.
 
 ## Install
+As prerequisite you have to have installed: `git` and `make`.
 
 `git clone` this repository to a modern ubuntu or debian. Change to the new directory and run as `root`: `make install`. This will install all necessary packages.
 - The python setup routine installs the packages locally (the clone path) and creates a link to `/usr/local/bin/bouncedemails`
@@ -17,3 +18,8 @@ __Bounced Email Handler__ separates incoming bounced emails in _temporary_ failu
 
 ## Update
 Change to the cloned repository and run `make update`. This pulls and apply new changes. Adjust the the configuration in `config.yml` and start the service with: `systemctl restart bouncedemails`.
+
+## Environment (read this first)
+__Bounced Email Handler__ starts with `production` environment and disabled `debug` mode by default. To start __Bounced Email Handler__ in `develop` mode you have to ensure that the systemd service is not running. Than run the service with `/usr/local/bin/bouncedemails --env develop --debug run`
+
+Ensure that __Bounced Email Handler__ can connect to the xikolo-account service. `ConnectionError`s are not catched and the services will stop immediately. (Although `systemd` tries to restart the __Bounced Email Handler__ after 3 seconds.)
