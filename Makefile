@@ -30,12 +30,12 @@ systemctl_install:
 	cp ./resources/bouncedemails.service /lib/systemd/system/bouncedemails.service
 	systemctl daemon-reload
 	systemctl enable bouncedemails
-	systemctl start bouncedemails
 
 install_project:
 	python3 ./setup.py develop
 
-update: clean install_project
-	systemctl restart bouncedemails
+update: clean
+	git pull origin master
+	python3 ./setup.py develop
 
 install: clean install_packages install_project systemctl_install

@@ -147,14 +147,10 @@ class Handler(object):
         r = requests.put(config['endpoint'], data = {'bounced_address': bounced_address})
         self._set_permanent_bounced_address(bounced_address, domain, r.status_code)
 
-    def check_message(self, body):
-        # we expect an email body
-        try:
-            return email.message_from_bytes(bytes(body))['From']
-        except:
-            return False
-
     def handle_message(self, body):
+        '''
+        handles soft and hard bounced emails
+        '''
         msg = email.message_from_bytes(bytes(body))
         self._log("------------- INCOMING MESSAGE -------------")
 
@@ -183,8 +179,6 @@ class Handler(object):
         self._log("Domain: %s" % domain)
 
         for bounced_address in temporary:
-            if not validate_email(bounced_address):
-                continue
             # sometimes a temporary failure is a permanent failure as well (strange, but yes)
             if bounced_address in permanent:
                 continue
@@ -192,7 +186,5 @@ class Handler(object):
             self._handle_temporary_bounced_address(bounced_address, domain)
 
         for bounced_address in permanent:
-            if not validate_email(bounced_address):
-                continue
             self._log("Permanent: %s" % bounced_address)
             self._handle_permanent_bounced_address(bounced_address, domain)
