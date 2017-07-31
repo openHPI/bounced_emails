@@ -22,5 +22,5 @@ production:
       openhpi.de:
         endpoint: http://10.210.0.32:7001/stop-notification
   amqp:
-    url: amqp://bouncedemails:h6kPPxkhZ3PVxSGUtr2H@10.210.0.30/bouncedemails
+    url: amqp://bouncedemails:h6kPPxkhZ3PVxSGUtr2H@10.210.0.30/%2fbouncedemails
     queue: bouncedemails
