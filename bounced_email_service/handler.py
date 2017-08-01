@@ -5,7 +5,6 @@ import sqlite3
 import requests
 import tldextract
 
-from pprint import pprint
 from email.utils import parseaddr
 from flufl.bounce import all_failures
 from validate_email import validate_email
@@ -19,7 +18,7 @@ class Handler(object):
 
     def _log(self, obj):
         if self.settings.debug:
-            pprint(obj)
+            print(obj)
 
     def _get_db_conn(self):
         return sqlite3.connect(self.handler_config['dbfile'])
@@ -153,6 +152,9 @@ class Handler(object):
         '''
         msg = email.message_from_bytes(bytes(body))
         self._log("------------- INCOMING MESSAGE -------------")
+        for key, value in msg.items():
+            self._log("%s:\t%s" % (key, value))
+        self._log("")
 
         t, p = all_failures(msg)
 
