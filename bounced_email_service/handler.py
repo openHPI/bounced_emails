@@ -146,6 +146,10 @@ class Handler(object):
         r = requests.put(config['endpoint'], data = {'bounced_address': bounced_address})
         self._set_permanent_bounced_address(bounced_address, domain, r.status_code)
 
+    def set_permanent_bounced_address(self, bounced_address, domain):
+        self._log("Permanent: %s" % bounced_address)
+        self._handle_permanent_bounced_address(bounced_address, domain)
+
     def handle_message(self, body):
         '''
         handles soft and hard bounced emails

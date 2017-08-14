@@ -26,6 +26,16 @@ def cli(ctx, env, debug):
 
 
 @cli.command()
+@click.option('--bounced_address', required=True, help='bounced address')
+@click.option('--domain', required=True, help="domain")
+@click.pass_context
+def set_permanent_bounced_address(ctx, bounced_address, domain):
+    """Set an email address as permanent failure"""
+    handler = Handler(ctx.obj)
+    handler.set_permanent_bounced_address(bounced_address, domain)
+
+
+@cli.command()
 @click.pass_context
 def run(ctx):
     """Run Bounced Email Service"""
