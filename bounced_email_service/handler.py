@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import re
 import email
-import urllib
 import sqlite3
 import requests
 import tldextract
 
+from urllib.parse import quote
 from email.utils import parseaddr
 from flufl.bounce import all_failures
 from validate_email import validate_email
@@ -145,7 +145,7 @@ class Handler(object):
     def _handle_permanent_bounced_address(self, bounced_address, domain):
         config = self.handler_config['domains'][domain]
         r = requests.post(
-            config['endpoint'].replace('{address}', urllib.parse.quote(bounced_address)),
+            config['endpoint'].replace('{address}', quote(bounced_address)),
             data = {})
         self._set_permanent_bounced_address(bounced_address, domain, r.status_code)
 
