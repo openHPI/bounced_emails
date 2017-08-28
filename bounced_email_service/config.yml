@@ -5,9 +5,9 @@ develop:
     temporary_threshold: 3
     domains:
       opensap.info:
-        endpoint: http://localhost/stop-notification
+        endpoint: http://localhost/emails/{address}/suspend
       openhpi.de:
-        endpoint: http://localhost/stop-notification
+        endpoint: http://localhost/emails/{address}/suspend
   amqp:
     url: amqp://mwiesner:geheim@localhost/%2f
     queue: bouncedemails
@@ -18,9 +18,9 @@ production:
     temporary_threshold: 3
     domains:
       opensap.info:
-        endpoint: http://10.210.0.30:7001/stop-notification
+        endpoint: http://10.210.0.32:7001/emails/{address}/suspend
       openhpi.de:
-        endpoint: http://10.210.0.32:7001/stop-notification
+        endpoint: http://10.210.0.30:7001/emails/{address}/suspend
   amqp:
     url: amqp://bouncedemails:h6kPPxkhZ3PVxSGUtr2H@10.210.0.30/%2fbouncedemails
     queue: bouncedemails

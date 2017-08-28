@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 import email
+import urllib
 import sqlite3
 import requests
 import tldextract
@@ -143,7 +144,9 @@ class Handler(object):
 
     def _handle_permanent_bounced_address(self, bounced_address, domain):
         config = self.handler_config['domains'][domain]
-        r = requests.put(config['endpoint'], data = {'bounced_address': bounced_address})
+        r = requests.post(
+            config['endpoint'].replace('{address}', urllib.quote(bounced_address)),
+            data = {})
         self._set_permanent_bounced_address(bounced_address, domain, r.status_code)
 
     def set_permanent_bounced_address(self, bounced_address, domain):
