@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-import re
+import os
+import gzip
 import email
 import sqlite3
 import requests
@@ -128,30 +129,47 @@ class Handler(object):
             domains.append("%s.%s" % (parts[-2], parts[-1]))
         return domains
 
+    def _store_permanent_bounced_email(self, bounced_address, body):
+        if not ('permanent_bounced_emails_path' in self.handler_config and body):
+            return
+
+        dir_path = self.handler_config['permanent_bounced_emails_path']
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+
+        path = os.path.join(dir_path, bounced_address + '.gz')
+        content = bytes(body)
+        with gzip.open(path, 'wb') as f:
+            f.write(content)
+
     def _handle_out_of_office_message(self, msg):
         pass
 
-    def _handle_temporary_bounced_address(self, bounced_address, domain):
+    def _handle_temporary_bounced_address(self, bounced_address, domain, body):
         temporary_threshold = self.handler_config['temporary_threshold']
         current_counter = self._get_bounced_address_counter(bounced_address, domain)
 
         if current_counter > temporary_threshold:
-            self._handle_permanent_bounced_address(bounced_address, domain)
+            self._handle_permanent_bounced_address(bounced_address, domain, body)
             self._reset_bounced_address(bounced_address, domain)
             return
 
         self._increase_bounced_address_counter(bounced_address, domain)
 
-    def _handle_permanent_bounced_address(self, bounced_address, domain):
+    def _handle_permanent_bounced_address(self, bounced_address, domain, body):
         config = self.handler_config['domains'][domain]
         r = requests.post(
             config['endpoint'].replace('{address}', quote(bounced_address)),
             data = {})
         self._set_permanent_bounced_address(bounced_address, domain, r.status_code)
+        self._store_permanent_bounced_email(bounced_address, body)
 
     def set_permanent_bounced_address(self, bounced_address, domain):
+        '''
+        handles manually bounced email addresses
+        '''
         self._log("Permanent: %s" % bounced_address)
-        self._handle_permanent_bounced_address(bounced_address, domain)
+        self._handle_permanent_bounced_address(bounced_address, domain, '')
 
     def handle_message(self, body):
         '''
@@ -192,8 +210,8 @@ class Handler(object):
             if bounced_address in permanent:
                 continue
             self._log("Temporary: %s" % bounced_address)
-            self._handle_temporary_bounced_address(bounced_address, domain)
+            self._handle_temporary_bounced_address(bounced_address, domain, body)
 
         for bounced_address in permanent:
             self._log("Permanent: %s" % bounced_address)
-            self._handle_permanent_bounced_address(bounced_address, domain)
+            self._handle_permanent_bounced_address(bounced_address, domain, body)

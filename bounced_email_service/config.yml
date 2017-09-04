@@ -2,6 +2,7 @@
 develop:
   handler:
     dbfile: /var/lib/bounced_emails.db
+    permanent_bounced_emails_path: /var/lib/permanent_bounced_emails
     temporary_threshold: 3
     domains:
       opensap.info:
@@ -15,6 +16,7 @@ develop:
 production:
   handler:
     dbfile: /var/lib/bounced_emails.db
+    permanent_bounced_emails_path: /var/lib/permanent_bounced_emails
     temporary_threshold: 3
     domains:
       opensap.info:
