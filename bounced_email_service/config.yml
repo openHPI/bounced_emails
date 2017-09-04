@@ -10,7 +10,7 @@ develop:
       openhpi.de:
         endpoint: http://localhost/emails/{address}/suspend
   amqp:
-    url: amqp://mwiesner:geheim@localhost/%2f
+    url: amqp://mwiesner:geheim@localhost/%2fbouncedemails
     queue: bouncedemails
 
 production:
