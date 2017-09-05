@@ -27,7 +27,7 @@ cd /vagrant
 make install
 
 # finally run bounced emails service
-/usr/local/bin/bouncedemails --env develop --debug run
+echo '/usr/local/bin/bouncedemails --env develop --debug run'
 SCRIPT
 
 Vagrant.configure("2") do |config|

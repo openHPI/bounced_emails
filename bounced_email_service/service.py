@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import sys
 import yaml
 import click
 
@@ -33,6 +34,16 @@ def set_permanent_bounced_address(ctx, bounced_address, domain):
     """Set an email address as permanent failure"""
     handler = Handler(ctx.obj)
     handler.set_permanent_bounced_address(bounced_address, domain)
+
+
+@cli.command()
+@click.pass_context
+def stdin(ctx):
+    """Get email for Bounced Email Service from stdin"""
+    lines = sys.stdin.readlines()
+    body = "".join(lines).strip().encode('utf-8')
+    handler = Handler(ctx.obj)
+    handler.handle_message(body)
 
 
 @cli.command()

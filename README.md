@@ -11,6 +11,13 @@ __Bounced Email Handler__ separates incoming bounced emails in _temporary_ failu
 	#!/bin/bash
     exec amqp-publish -u amqp://<rabbitmq-user>:<rabbitmq-password>@<rabbitmq-server>/%2fbouncedemails -r "bouncedemails"
 	```
+
+- _Update_: Read Email body from `stdin`:
+Alternatively the email can be read from the standard input. This makes the rabbitmq-server obsolete. If the __Bounced Email Handler__ is installed on the postfix server, the postfix can send a bounced email directly to __Bounced Email Handler__. For this:
+	- configure `/etc/postfix/main.cf` as shown above
+	- add to `/etc/aliases` the `no-reply` user: `no-reply: | bouncedemails stdin`
+	- assure, that the postfix user can execute `/usr/local/bin/bouncedemails`. This includes the write access to the sqlite3 database and the storage path (see config).
+
 - __Bounced Email Handler__ consumes the message queue. The message handler separates the incoming bounced email and handles them accordingly:
 	- _Temporary_ failure: The accused email address in the bounced email and the domain from which the originally email was sent are stored in a local database together with a counter. The counter is incremented with each new incoming occurence. Once the counter exceeds a configured threshold, the accordingly email address is treaten as a permanent failure (and the counter is resetted).
 	- _Permanent_ failure: The accused email address in the bounced email is reported to the xikolo-account service. The xikolo-account service disables all notifications regarding this email address.
