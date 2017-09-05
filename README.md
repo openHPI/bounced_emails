@@ -7,10 +7,10 @@ __Bounced Email Handler__ separates incoming bounced emails in _temporary_ failu
 	- add the domains which should be handled to `/etc/postfix/main.cf` to `mydestination = ..., openhpi.de, opensap.info`:
 	- add to `/etc/aliases` the `no-reply` user: `no-reply: |/usr/local/bin/send_message_to_rabbitmq.sh`
 	- create the file `/usr/local/bin/send_message_to_rabbitmq.sh` with:
-	```bash
-	#!/bin/bash
-    exec amqp-publish -u amqp://<rabbitmq-user>:<rabbitmq-password>@<rabbitmq-server>/%2fbouncedemails -r "bouncedemails"
-	```
+```bash
+#!/bin/bash
+exec amqp-publish -u amqp://<rabbitmq-user>:<rabbitmq-password>@<rabbitmq-server>/%2fbouncedemails -r "bouncedemails"
+```
 
 - _Update_: Read Email body from `stdin`:
 Alternatively the email can be read from the standard input. This makes the rabbitmq-server obsolete. If the __Bounced Email Handler__ is installed on the postfix server, the postfix can send a bounced email directly to __Bounced Email Handler__. For this:
