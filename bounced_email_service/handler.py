@@ -133,7 +133,10 @@ class Handler(object):
         if not ('permanent_bounced_emails_path' in self.handler_config and body):
             return
 
-        dir_path = self.handler_config['permanent_bounced_emails_path']
+        dir_path = os.path.join(
+            self.handler_config['permanent_bounced_emails_path'],
+            bounced_address[0:2].lower())
+
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
 
