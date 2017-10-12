@@ -17,6 +17,9 @@ setup(
         'validate_email',
         'tldextract',
         'requests',
+        'cachecontrol',
+        'uritemplate',
+        'mock'
     ],
     entry_points={
         'console_scripts': [

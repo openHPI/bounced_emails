@@ -4,8 +4,8 @@ import sys
 import yaml
 import click
 
-from .consumer import Consumer
-from .handler import Handler
+from bounced_email_service.consumer import Consumer
+from bounced_email_service.handler import Handler
 
 
 class BouncedEmailSettings(object):

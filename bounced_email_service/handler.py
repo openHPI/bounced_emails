@@ -4,26 +4,40 @@ import re
 import gzip
 import email
 import sqlite3
-import requests
 import tldextract
 
 from datetime import datetime
-from urllib.parse import quote
 from email.utils import parseaddr
 from flufl.bounce import all_failures
 from validate_email import validate_email
+
+from bounced_email_service.suspender import XikoloSuspender, DefaultSuspender
 
 
 class Handler(object):
     def __init__(self, settings):
         self.settings = settings
         self.handler_config = settings.config[settings.env]['handler']
+        self.suspender_config = settings.config[settings.env]['suspender']
+        self.suspender = {}
+        self._init_suspender()
         self._init_db()
-        self.cache = {}
 
     def _log(self, obj):
         if self.settings.debug:
             print(obj)
+
+    def _init_suspender(self):
+        domains = self.suspender_config.keys()
+        for domain in domains:
+            config = self.suspender_config[domain]
+
+            if domain in XikoloSuspender.mydomains:
+                self.suspender[domain] = XikoloSuspender(config)
+            elif domain in DefaultSuspender.mydomains:
+                self.suspender[domain] = DefaultSuspender(config)
+            else:
+                raise Exception('No suspender found')
 
     def _get_db_conn(self):
         return sqlite3.connect(self.handler_config['dbfile'])
@@ -162,44 +176,8 @@ class Handler(object):
 
         self._increase_bounced_address_counter(bounced_address, domain)
 
-    def xikolo_suspend(self, domain, bounced_address):
-        config = self.handler_config['domains'][domain]
-
-        now = datetime.now()
-        if domain in self.cache \
-            and now.timestamp() < self.cache[domain]['expire_at']:
-            endpoint = self.cache[domain]['endpoint']
-        else:
-            r = requests.get(config['base_url'])
-            endpoint = r.json()[config['url_type']]
-
-            self.cache[domain] = {}
-            self.cache[domain]['endpoint'] = endpoint
-            if 'Cache-Control' in r.headers:
-                m = re.search('max-age=(\d+),', r.headers['Cache-Control'])
-                max_age = int(m.group(1))
-            else:
-                max_age = 3600
-            self.cache[domain]['expire_at'] = now.timestamp() + max_age
-
-        r = requests.post(
-            endpoint.replace(
-                config['pattern'], quote(bounced_address, safe='')),
-            data={})
-
-        return r.status_code
-
-    def default_suspend(self, domain, bounced_address):
-        config = self.handler_config['domains'][domain]
-        r = requests.put(
-            config['endpoint']),
-            data={'email_address': bounced_address})
-        return r.status_code
-
     def _handle_permanent_bounced_address(self, bounced_address, domain, body):
-        suspend_method = self.handler_config['domains'][domain]['suspend_method']
-
-        status_code = getattr(self, suspend_method)(bounced_address, domain)
+        status_code = self.suspender[domain].suspend(bounced_address)
 
         self._set_permanent_bounced_address(bounced_address, domain, status_code)
         self._store_permanent_bounced_email(bounced_address, body)
@@ -238,7 +216,7 @@ class Handler(object):
             return self._handle_out_of_office_message(msg)
 
         for domain in self._get_origin_to_domains(msg):
-            if domain in self.handler_config['domains'].keys():
+            if domain in self.suspender_config.keys():
                 break
         else:
             raise Exception("Domain not found")
