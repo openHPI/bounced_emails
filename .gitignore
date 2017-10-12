@@ -1,6 +1,7 @@
-tests
 .vagrant
 .vscode
 *egg-info
 *.log
 *__pycache__
+tests/*-bounces
+tests/testdata
