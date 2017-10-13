@@ -4,10 +4,9 @@ develop:
     dbfile: /var/lib/bounced_emails.db
     permanent_bounced_emails_path: /var/lib/permanent_bounced_emails
     temporary_threshold: 3
-  suspender:
-    mydomain.de:
-      endpoint: http://localhost/emails/suspend
-
+    domains:
+      mydomain.de:
+        endpoint: http://localhost/emails/suspend
   amqp:
     url: amqp://mwiesner:geheim@localhost/%2fbouncedemails
     queue: bouncedemails
@@ -17,15 +16,11 @@ production:
     dbfile: /var/lib/bounced_emails.db
     permanent_bounced_emails_path: /var/lib/permanent_bounced_emails
     temporary_threshold: 3
-
-  suspender:
-    opensap.info:
-      base_url: http://10.210.0.32:7001
-    openhpi.de:
-      base_url: http://10.210.0.30:7001
-    mydomain.de:
-      endpoint: http://mydomain.de/emails/suspend/
-
+    domains:
+      opensap.info:
+        base_url: http://10.210.0.32:7001
+      openhpi.de:
+        base_url: http://10.210.0.30:7001
   amqp:
     url: amqp://bouncedemails:h6kPPxkhZ3PVxSGUtr2H@10.210.0.30/%2fbouncedemails
     queue: bouncedemails

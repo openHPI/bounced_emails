@@ -8,7 +8,7 @@ from bounced_email_service.handler import Handler
 class TestHandleMessage(unittest.TestCase):
 
     @mock.patch('bounced_email_service.handler.os.makedirs', mock.Mock())
-    @mock.patch('bounced_email_service.suspender.CacheControl')
+    @mock.patch('bounced_email_service.handler.CacheControl')
     @mock.patch('bounced_email_service.handler.sqlite3')
     @mock.patch('bounced_email_service.handler.gzip')
     @mock.patch('bounced_email_service.handler.all_failures')
@@ -21,13 +21,13 @@ class TestHandleMessage(unittest.TestCase):
                 dbfile: /tmp/bounced_emails.db
                 permanent_bounced_emails_path: /tmp/permanent_bounced_emails
                 temporary_threshold: 3
-            suspender:
-                opensap.info:
-                    base_url: http://127.0.0.1:7001
-                openhpi.de:
-                    base_url: http://127.0.0.1:7001
-                mydomain.de:
-                    base_url: http://mydomain.de/emails/suspend/
+                domains:
+                    opensap.info:
+                        base_url: http://127.0.0.1:7001
+                    openhpi.de:
+                        base_url: http://127.0.0.1:7001
+                    mydomain.de:
+                        base_url: http://mydomain.de/emails/suspend/
         ''')
 
         cursor = mock.Mock()

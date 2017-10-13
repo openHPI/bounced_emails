@@ -4,40 +4,29 @@ import re
 import gzip
 import email
 import sqlite3
+import requests
 import tldextract
 
 from datetime import datetime
+from urllib.parse import quote
 from email.utils import parseaddr
+from uritemplate import URITemplate
 from flufl.bounce import all_failures
+from cachecontrol import CacheControl
 from validate_email import validate_email
-
-from bounced_email_service.suspender import XikoloSuspender, DefaultSuspender
 
 
 class Handler(object):
     def __init__(self, settings):
         self.settings = settings
         self.handler_config = settings.config[settings.env]['handler']
-        self.suspender_config = settings.config[settings.env]['suspender']
-        self.suspender = {}
-        self._init_suspender()
+        self.cached_session = CacheControl(requests.session())
+
         self._init_db()
 
     def _log(self, obj):
         if self.settings.debug:
             print(obj)
-
-    def _init_suspender(self):
-        domains = self.suspender_config.keys()
-        for domain in domains:
-            config = self.suspender_config[domain]
-
-            if domain in XikoloSuspender.mydomains:
-                self.suspender[domain] = XikoloSuspender(config)
-            elif domain in DefaultSuspender.mydomains:
-                self.suspender[domain] = DefaultSuspender(config)
-            else:
-                raise Exception('No suspender found')
 
     def _get_db_conn(self):
         return sqlite3.connect(self.handler_config['dbfile'])
@@ -177,7 +166,14 @@ class Handler(object):
         self._increase_bounced_address_counter(bounced_address, domain)
 
     def _handle_permanent_bounced_address(self, bounced_address, domain, body):
-        status_code = self.suspender[domain].suspend(bounced_address)
+        config = self.handler_config['domains'][domain]        
+
+        response = self.cached_session.get(config['base_url'])
+        uri = response.json()['email_suspensions_url']
+        tpl = URITemplate(uri)
+        endpoint = tpl.expand(address=quote(bounced_address, safe=''))
+
+        status_code = self.cached_session.post(endpoint, data={}).status_code
 
         self._set_permanent_bounced_address(bounced_address, domain, status_code)
         self._store_permanent_bounced_email(bounced_address, body)
@@ -216,7 +212,7 @@ class Handler(object):
             return self._handle_out_of_office_message(msg)
 
         for domain in self._get_origin_to_domains(msg):
-            if domain in self.suspender_config.keys():
+            if domain in self.handler_config['domains'].keys():
                 break
         else:
             raise Exception("Domain not found")
