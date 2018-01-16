@@ -3,7 +3,7 @@ apt update
 apt -y upgrade
 
 # install all needed packages
-apt install -y python3 rabbitmq-server amqp-tools make git nginx
+apt install -y python3 rabbitmq-server amqp-tools make git
 
 # set python3 as default
 rm -f /usr/bin/python
@@ -25,6 +25,9 @@ $rabbitmqadmin declare queue --vhost=/bouncedemails name=bouncedemails durable=t
 # install bounced emails
 cd /vagrant
 make install
+
+# Start develop webserver
+echo 'python3 /vagrant/develop_webserver.py 7001'
 
 # finally run bounced emails service
 echo '/usr/local/bin/bouncedemails --env develop --debug run'

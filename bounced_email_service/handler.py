@@ -8,7 +8,6 @@ import requests
 import tldextract
 
 from datetime import datetime
-from urllib.parse import quote
 from email.utils import parseaddr
 from uritemplate import URITemplate
 from flufl.bounce import all_failures
@@ -171,11 +170,14 @@ class Handler(object):
         response = self.cached_session.get(config['base_url'])
         uri = response.json()['email_suspensions_url']
         tpl = URITemplate(uri)
-        endpoint = tpl.expand(address=quote(bounced_address, safe=''))
+        endpoint = tpl.expand(address=bounced_address)
 
-        status_code = self.cached_session.post(endpoint, data={}).status_code
+        self._log("Post request to: %s for address: %s" % (endpoint, bounced_address))
 
-        self._set_permanent_bounced_address(bounced_address, domain, status_code)
+        response = self.cached_session.post(endpoint, data={})
+        self._log("Response text: %s" % response.text)
+
+        self._set_permanent_bounced_address(bounced_address, domain, response.status_code)
         self._store_permanent_bounced_email(bounced_address, body)
 
     def set_permanent_bounced_address(self, bounced_address, domain):
@@ -215,7 +217,7 @@ class Handler(object):
             if domain in self.handler_config['domains'].keys():
                 break
         else:
-            raise Exception("Domain not found")
+            raise Exception("Domain '%s' not found" % domain)
 
         self._log("Domain: %s" % domain)
 

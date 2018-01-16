@@ -1,12 +1,16 @@
 ---
 develop:
   handler:
-    dbfile: /var/lib/bounced_emails.db
-    permanent_bounced_emails_path: /var/lib/permanent_bounced_emails
+    dbfile: /tmp/bounced_emails.db
+    permanent_bounced_emails_path: /tmp/permanent_bounced_emails
     temporary_threshold: 3
     domains:
       mydomain.de:
-        endpoint: http://localhost/emails/suspend
+        base_url: http://localhost:7001
+      openhpi.de:
+        base_url: http://localhost:7001
+      opensap.info:
+        base_url: http://localhost:7001
   amqp:
     url: amqp://mwiesner:geheim@localhost/%2fbouncedemails
     queue: bouncedemails
