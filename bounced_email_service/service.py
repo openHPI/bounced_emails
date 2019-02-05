@@ -37,6 +37,15 @@ def set_permanent_bounced_address(ctx, bounced_address, domain):
 
 
 @cli.command()
+@click.option('--address', required=True, help='email address')
+@click.pass_context
+def find_address(ctx, address):
+    """Find an email address within permanent or temporary bounced emails"""
+    handler = Handler(ctx.obj)
+    handler.find_address(address)
+
+
+@cli.command()
 @click.pass_context
 def stdin(ctx):
     """Get email for Bounced Email Service from stdin"""

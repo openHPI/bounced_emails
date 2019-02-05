@@ -93,6 +93,28 @@ class Handler(object):
         con.close()
         return result
 
+    def _find_address(self, address):
+        con = self._get_db_conn()
+        cur = con.cursor()
+        stmt = '''
+        SELECT * FROM permanent_bounces
+            WHERE bounced_address LIKE :bounced_address;
+        '''
+        cur.execute(stmt.strip(), {'bounced_address': '%{0}%'.format(address)})
+        permanent_bounces = cur.fetchall()
+
+        stmt = '''
+        SELECT * FROM temporary_bounces
+            WHERE bounced_address LIKE :bounced_address;
+        '''
+        cur.execute(stmt.strip(), {'bounced_address': '%{0}%'.format(address)})
+        temporary_bounces = cur.fetchall()
+
+        cur.close()
+        con.close()
+        return permanent_bounces, temporary_bounces
+
+
     def _reset_bounced_address(self, bounced_address, domain):
         con = self._get_db_conn()
         cur = con.cursor()
@@ -186,6 +208,21 @@ class Handler(object):
         '''
         self._log("Permanent: %s" % bounced_address)
         self._handle_permanent_bounced_address(bounced_address, domain, '')
+
+    def find_address(self, address):
+        '''
+        Find an email address within permanent or temporary bounced emails
+        '''
+        self._log("Find: %s" % address)
+        permanent_bounces, temporary_bounces = self._find_address(address)
+
+        print('> Permanent bounces for address {0}'.format(address))
+        for address in permanent_bounces:
+            print(address)
+        
+        print('> Temporary bounces for address {0}'.format(address))
+        for address in temporary_bounces:
+            print(address)
 
     def handle_message(self, body):
         '''
