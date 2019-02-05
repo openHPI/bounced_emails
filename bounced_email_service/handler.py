@@ -216,13 +216,13 @@ class Handler(object):
         self._log("Find: %s" % address)
         permanent_bounces, temporary_bounces = self._find_address(address)
 
-        print('> Permanent bounces for address {0}'.format(address))
-        for address in permanent_bounces:
-            print(address)
+        print('> Permanent bounces for address: "{0}"'.format(address))
+        for entry in permanent_bounces:
+            print(entry)
         
-        print('> Temporary bounces for address {0}'.format(address))
-        for address in temporary_bounces:
-            print(address)
+        print('> Temporary bounces for address: "{0}"'.format(address))
+        for entry in temporary_bounces:
+            print(entry)
 
     def handle_message(self, body):
         '''
