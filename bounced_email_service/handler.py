@@ -234,7 +234,9 @@ class Handler(object):
         msg = email.message_from_bytes(bytes(body))
         logger.info("------------- INCOMING MESSAGE -------------")
         for key, value in msg.items():
-            logger.info("%s:\t%s", key, value.split("\n")[0] + '...')
+            lines = value.split("\n")
+            line = lines[0] if len(lines) == 1 else lines[0] + '...'
+            logger.info("%s:\t%s", key, line)
 
         t, p = all_failures(msg)
 
