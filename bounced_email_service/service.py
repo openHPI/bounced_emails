@@ -18,7 +18,7 @@ class BouncedEmailSettings(object):
 
     def setup_logging(self):
         loglevel = logging.DEBUG if self.debug else logging.INFO
-        logger = logging.getLogger()
+        logger = logging.getLogger('bouncedemails')
         logger.setLevel(loglevel)
         ch = logging.StreamHandler(sys.stdout)
         ch.setLevel(loglevel)

@@ -16,7 +16,7 @@ from cachecontrol import CacheControl
 from validate_email import validate_email
 
 
-logger = logging.getLogger()
+logger = logging.getLogger('bouncedemails')
 
 
 class BouncedEmailException(Exception): pass

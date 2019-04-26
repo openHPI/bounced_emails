@@ -4,7 +4,7 @@ import logging
 from pprint import pprint
 from bounced_email_service.handler import BouncedEmailException
 
-logger = logging.getLogger()
+logger = logging.getLogger('bouncedemails')
 
 
 class Consumer(object):
