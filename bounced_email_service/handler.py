@@ -234,9 +234,14 @@ class Handler(object):
         msg = email.message_from_bytes(bytes(body))
         logger.info("------------- INCOMING MESSAGE -------------")
         for key, value in msg.items():
-            lines = value.split("\n")
-            line = lines[0] if len(lines) == 1 else lines[0] + '...'
-            logger.info("%s:\t%s", key, line)
+            if any(value.startswith(h) for h in ['From:', 'To:', 'Subject:']):
+                logger.info("%s:\t%s", key, value)
+
+        for domain in self._get_origin_to_domains(msg):
+            if domain in self.handler_config['domains'].keys():
+                break
+        else:
+            raise BouncedEmailException("Domain '%s' not found" % domain)
 
         t, p = all_failures(msg)
 
@@ -253,12 +258,6 @@ class Handler(object):
 
         if not (temporary or permanent):
             return self._handle_out_of_office_message(msg)
-
-        for domain in self._get_origin_to_domains(msg):
-            if domain in self.handler_config['domains'].keys():
-                break
-        else:
-            raise BouncedEmailException("Domain '%s' not found" % domain)
 
         logger.debug("Domain: %s", domain)
 
