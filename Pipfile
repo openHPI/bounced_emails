@@ -7,18 +7,15 @@ verify_ssl = true
 autopep8 = "*"
 
 [packages]
-Flask = "*"
-Flask-WTF = "*"
-Jinja2 = "*"
-PyLTI = "*"
-orator = "*"
-markovify = "*"
-pgpy = "*"
-click = "*"
-gunicorn = "*"
-pytest = "*"
-pytest-flask = "*"
-pytest-mock = "*"
+PyYaml = "*"
+Click = "*"
+pika = "*"
+"flufl.bounce" = "*"
+validate_email = "*"
+tldextract = "*"
+requests = "*"
+cachecontrol = "*"
+uritemplate = "*"
 mock = "*"
 
 [requires]
