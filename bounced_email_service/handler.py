@@ -234,7 +234,7 @@ class Handler(object):
         msg = email.message_from_bytes(bytes(body))
         logger.info("------------- INCOMING MESSAGE -------------")
         for key, value in msg.items():
-            if any(value.startswith(h) for h in ['From:', 'To:', 'Subject:']):
+            if any(key.startswith(h) for h in ['From', 'To', 'Subject']):
                 logger.info("%s:\t%s", key, value)
 
         for domain in self._get_origin_to_domains(msg):
