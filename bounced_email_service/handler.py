@@ -219,13 +219,13 @@ class Handler(object):
         logger.debug("Find: %s", address)
         permanent_bounces, temporary_bounces = self._find_address(address)
 
-        print('> Permanent bounces for address: "{0}"'.format(address))
+        logger.debug('> Permanent bounces for address: "{0}"'.format(address))
         for entry in permanent_bounces:
-            print(entry)
+            logger.debug(entry)
         
-        print('> Temporary bounces for address: "{0}"'.format(address))
+        logger.debug('> Temporary bounces for address: "{0}"'.format(address))
         for entry in temporary_bounces:
-            print(entry)
+            logger.debug(entry)
 
     def handle_message(self, body):
         '''
@@ -234,7 +234,7 @@ class Handler(object):
         msg = email.message_from_bytes(bytes(body))
         logger.info("------------- INCOMING MESSAGE -------------")
         for key, value in msg.items():
-            logger.info("%s:\t%s", key, value)
+            logger.info("%s:\t%s", key, value.split("\n")[0] + '...')
 
         t, p = all_failures(msg)
 
