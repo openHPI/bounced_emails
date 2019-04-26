@@ -3,6 +3,7 @@ import os
 import re
 import gzip
 import email
+import logging
 import sqlite3
 import requests
 import tldextract
@@ -15,6 +16,12 @@ from cachecontrol import CacheControl
 from validate_email import validate_email
 
 
+logger = logging.getLogger()
+
+
+class BouncedEmailException(Exception): pass
+
+
 class Handler(object):
     def __init__(self, settings):
         self.settings = settings
@@ -22,10 +29,6 @@ class Handler(object):
         self.cached_session = CacheControl(requests.session())
 
         self._init_db()
-
-    def _log(self, obj):
-        if self.settings.debug:
-            print(obj)
 
     def _get_db_conn(self):
         return sqlite3.connect(self.handler_config['dbfile'])
@@ -194,10 +197,10 @@ class Handler(object):
         tpl = URITemplate(uri)
         endpoint = tpl.expand(address=bounced_address)
 
-        self._log("Post request to: %s for address: %s" % (endpoint, bounced_address))
+        logger.debug("Post request to: %s for address: %s", endpoint, bounced_address)
 
         response = self.cached_session.post(endpoint, data={})
-        self._log("Response text: %s" % response.text)
+        logger.debug("Response text: %s", response.text)
 
         self._set_permanent_bounced_address(bounced_address, domain, response.status_code)
         self._store_permanent_bounced_email(bounced_address, body)
@@ -206,14 +209,14 @@ class Handler(object):
         '''
         handles manually bounced email addresses
         '''
-        self._log("Permanent: %s" % bounced_address)
+        logger.debug("Permanent: %s", bounced_address)
         self._handle_permanent_bounced_address(bounced_address, domain, '')
 
     def find_address(self, address):
         '''
         Find an email address within permanent or temporary bounced emails
         '''
-        self._log("Find: %s" % address)
+        logger.debug("Find: %s", address)
         permanent_bounces, temporary_bounces = self._find_address(address)
 
         print('> Permanent bounces for address: "{0}"'.format(address))
@@ -229,10 +232,9 @@ class Handler(object):
         handles soft and hard bounced emails
         '''
         msg = email.message_from_bytes(bytes(body))
-        self._log("------------- INCOMING MESSAGE -------------")
+        logger.info("------------- INCOMING MESSAGE -------------")
         for key, value in msg.items():
-            self._log("%s:\t%s" % (key, value))
-        self._log("")
+            logger.info("%s:\t%s", key, value)
 
         t, p = all_failures(msg)
 
@@ -254,17 +256,17 @@ class Handler(object):
             if domain in self.handler_config['domains'].keys():
                 break
         else:
-            raise Exception("Domain '%s' not found" % domain)
+            raise BouncedEmailException("Domain '%s' not found" % domain)
 
-        self._log("Domain: %s" % domain)
+        logger.debug("Domain: %s", domain)
 
         for bounced_address in temporary:
             # sometimes a temporary failure is a permanent failure as well (strange, but yes)
             if bounced_address in permanent:
                 continue
-            self._log("Temporary: %s" % bounced_address)
+            logger.debug("Temporary: %s", bounced_address)
             self._handle_temporary_bounced_address(bounced_address, domain, body)
 
         for bounced_address in permanent:
-            self._log("Permanent: %s" % bounced_address)
+            logger.debug("Permanent: %s", bounced_address)
             self._handle_permanent_bounced_address(bounced_address, domain, body)

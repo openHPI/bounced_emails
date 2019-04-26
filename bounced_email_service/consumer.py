@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 import pika
+import logging
 from pprint import pprint
+from bounced_email_service.handler import BouncedEmailException
+
+logger = logging.getLogger()
 
 
 class Consumer(object):
@@ -15,7 +19,10 @@ class Consumer(object):
 
     def _callback(self, ch, method, properties, body):
         ch.basic_ack(delivery_tag = method.delivery_tag)
-        self.handler.handle_message(body)
+        try:
+            self.handler.handle_message(body)
+        except BouncedEmailException as e:
+            logger.error('An exception occured: %s', e)
 
     def run(self):
         url = self.amqp_config['url']

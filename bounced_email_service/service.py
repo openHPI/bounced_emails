@@ -3,9 +3,7 @@ import os
 import sys
 import yaml
 import click
-
-from bounced_email_service.consumer import Consumer
-from bounced_email_service.handler import Handler
+import logging
 
 
 class BouncedEmailSettings(object):
@@ -15,6 +13,18 @@ class BouncedEmailSettings(object):
         self.project_root = os.path.dirname(os.path.abspath(__file__))
         self.config = yaml.load(
             open(os.path.join(self.project_root, 'config.yml')).read())
+        
+        self.setup_logging()
+
+    def setup_logging(self):
+        loglevel = logging.DEBUG if self.debug else logging.INFO
+        logger = logging.getLogger()
+        logger.setLevel(loglevel)
+        ch = logging.StreamHandler(sys.stdout)
+        ch.setLevel(loglevel)
+        formatter = logging.Formatter('%(name)s - %(message)s')
+        ch.setFormatter(formatter)
+        logger.addHandler(ch)
 
 
 @click.group()
@@ -32,6 +42,8 @@ def cli(ctx, env, debug):
 @click.pass_context
 def set_permanent_bounced_address(ctx, bounced_address, domain):
     """Set an email address as permanent failure"""
+    from bounced_email_service.handler import Handler
+
     handler = Handler(ctx.obj)
     handler.set_permanent_bounced_address(bounced_address, domain)
 
@@ -41,6 +53,8 @@ def set_permanent_bounced_address(ctx, bounced_address, domain):
 @click.pass_context
 def find_address(ctx, address):
     """Find an email address within permanent or temporary bounced emails"""
+    from bounced_email_service.handler import Handler
+
     handler = Handler(ctx.obj)
     handler.find_address(address)
 
@@ -49,6 +63,8 @@ def find_address(ctx, address):
 @click.pass_context
 def stdin(ctx):
     """Get email for Bounced Email Service from stdin"""
+    from bounced_email_service.handler import Handler
+
     lines = sys.stdin.readlines()
     body = "".join(lines).strip().encode('utf-8')
     handler = Handler(ctx.obj)
@@ -59,6 +75,9 @@ def stdin(ctx):
 @click.pass_context
 def run(ctx):
     """Run Bounced Email Service"""
+    from bounced_email_service.handler import Handler
+    from bounced_email_service.consumer import Consumer
+
     try:
         handler = Handler(ctx.obj)
         consumer = Consumer(ctx.obj, handler)
