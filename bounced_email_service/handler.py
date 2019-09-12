@@ -200,7 +200,7 @@ class Handler(object):
         logger.debug("Post request to: %s for address: %s", endpoint, bounced_address)
 
         response = self.cached_session.post(endpoint, data={})
-        logger.debug("Response text: %s", response.text)
+        logger.debug("Response (%s): %s ", response.status, response.text)
 
         self._set_permanent_bounced_address(bounced_address, domain, response.status_code)
         self._store_permanent_bounced_email(bounced_address, body)
