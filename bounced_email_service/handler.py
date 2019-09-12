@@ -200,7 +200,7 @@ class Handler(object):
         logger.debug("Post request to: %s for address: %s", endpoint, bounced_address)
 
         response = self.cached_session.post(endpoint, data={})
-        logger.debug("Response (%s): %s ", response.status_code, response.text)
+        logger.info("Response (%s): %s ", response.status_code, response.text)
 
         self._set_permanent_bounced_address(bounced_address, domain, response.status_code)
         self._store_permanent_bounced_email(bounced_address, body)
@@ -259,15 +259,15 @@ class Handler(object):
         if not (temporary or permanent):
             return self._handle_out_of_office_message(msg)
 
-        logger.debug("Domain: %s", domain)
+        logger.info("Domain: %s", domain)
 
         for bounced_address in temporary:
             # sometimes a temporary failure is a permanent failure as well (strange, but yes)
             if bounced_address in permanent:
                 continue
-            logger.debug("Temporary: %s", bounced_address)
+            logger.info("Temporary: %s", bounced_address)
             self._handle_temporary_bounced_address(bounced_address, domain, body)
 
         for bounced_address in permanent:
-            logger.debug("Permanent: %s", bounced_address)
+            logger.info("Permanent: %s", bounced_address)
             self._handle_permanent_bounced_address(bounced_address, domain, body)
