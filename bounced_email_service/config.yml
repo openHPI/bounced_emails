@@ -24,7 +24,10 @@ production:
       opensap.info:
         base_url: http://account.api.production.opensap.xi.xopic.de 
       openhpi.de:
-        base_url: http://account.api.production.openhpi.xi.xopic.de 
+        base_url: http://account.api.production.openhpi.xi.xopic.de
+      openwho.org:
+        base_url: http://account.api.production.openwho.xi.xopic.de
+
   amqp:
     url: amqp://bouncedemails:h6kPPxkhZ3PVxSGUtr2H@localhost/%2fbouncedemails
     queue: bouncedemails
