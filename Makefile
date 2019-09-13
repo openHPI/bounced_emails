@@ -38,7 +38,7 @@ install_project:
 
 update: clean
 	git pull origin master
-	pipenv install
+	pipenv install --system
 	python3 ./setup.py develop
 
 install: clean install_packages install_project systemctl_install
