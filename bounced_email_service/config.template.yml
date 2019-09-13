@@ -1,0 +1,16 @@
+---
+develop:
+  handler:
+    dbfile: /tmp/bounced_emails.db
+    permanent_bounced_emails_path: /tmp/permanent_bounced_emails
+    temporary_threshold: 3
+    domains:
+      mydomain.de:
+        base_url: http://localhost:7001
+  amqp:
+    url: amqp://mwiesner:geheim@localhost/%2fbouncedemails
+    queue: bouncedemails
+
+  amqp:
+    url: amqp://bouncedemails:geheim@localhost/%2fbouncedemails
+    queue: bouncedemails

@@ -190,7 +190,7 @@ class Handler(object):
         self._increase_bounced_address_counter(bounced_address, domain)
 
     def _handle_permanent_bounced_address(self, bounced_address, domain, body):
-        config = self.handler_config['domains'][domain]        
+        config = self.handler_config['domains'][domain]
 
         response = self.cached_session.get(config['base_url'])
         uri = response.json()['email_suspensions_url']
