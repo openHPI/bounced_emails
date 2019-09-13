@@ -10,7 +10,3 @@ develop:
   amqp:
     url: amqp://mwiesner:geheim@localhost/%2fbouncedemails
     queue: bouncedemails
-
-  amqp:
-    url: amqp://bouncedemails:geheim@localhost/%2fbouncedemails
-    queue: bouncedemails

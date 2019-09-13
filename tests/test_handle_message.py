@@ -15,7 +15,7 @@ class TestHandleMessage(unittest.TestCase):
     def test_handle_message(self, all_failures, gzip, sqlite3, CacheControl):
         settings = mock.Mock()
         settings.env = 'test'
-        settings.config = yaml.load('''
+        settings.config = yaml.safe_load('''
         test:
             handler:
                 dbfile: /tmp/bounced_emails.db
@@ -51,7 +51,8 @@ class TestHandleMessage(unittest.TestCase):
             [b'permanent1@domain.de', b'permanent2@domain.de'])
 
         response = mock.Mock()
-        response.json.return_value = {"email_suspensions_url": "http://127.0.0.1:7001/emails/{address}/suspend"}
+        response.json.return_value = {
+            "email_suspensions_url": "http://127.0.0.1:7001/emails/{address}/suspend"}
         response._status_code = 200
 
         cached_session.get.return_value = response
@@ -59,7 +60,7 @@ class TestHandleMessage(unittest.TestCase):
 
         handler.handle_message(body)
 
-        ### So was wollen wir eigentl. alles abtesten? (Nur das wichtigste)
+        # So was wollen wir eigentl. alles abtesten? (Nur das wichtigste)
 
         # die beiden permanenten werden suspended
         # zunaechst die API Abfrage
@@ -69,23 +70,31 @@ class TestHandleMessage(unittest.TestCase):
             cached_session.get.call_args_list)
         # der suspend post request
         self.assertEqual([
-            mock.call('http://127.0.0.1:7001/emails/permanent1%2540domain.de/suspend', data={}),
+            mock.call(
+                'http://127.0.0.1:7001/emails/permanent1%2540domain.de/suspend', data={}),
             mock.call('http://127.0.0.1:7001/emails/permanent2%2540domain.de/suspend', data={})],
             cached_session.post.call_args_list)
 
         # die beiden temporaeren werden abgefragt und inkrementiert
-        self.assertTrue('SELECT counter FROM temporary_bounces' in cursor.execute.call_args_list[2][0][0])
-        self.assertTrue('INSERT OR REPLACE INTO temporary_bounces' in cursor.execute.call_args_list[3][0][0])
+        self.assertTrue(
+            'SELECT counter FROM temporary_bounces' in cursor.execute.call_args_list[2][0][0])
+        self.assertTrue(
+            'INSERT OR REPLACE INTO temporary_bounces' in cursor.execute.call_args_list[3][0][0])
 
-        self.assertTrue('SELECT counter FROM temporary_bounces' in cursor.execute.call_args_list[4][0][0])
-        self.assertTrue('INSERT OR REPLACE INTO temporary_bounces' in cursor.execute.call_args_list[5][0][0])
+        self.assertTrue(
+            'SELECT counter FROM temporary_bounces' in cursor.execute.call_args_list[4][0][0])
+        self.assertTrue(
+            'INSERT OR REPLACE INTO temporary_bounces' in cursor.execute.call_args_list[5][0][0])
 
         # die beiden permanenten werden in die db eingetragen
-        self.assertTrue('INSERT INTO permanent_bounces' in cursor.execute.call_args_list[6][0][0])
-        self.assertTrue('INSERT INTO permanent_bounces' in cursor.execute.call_args_list[7][0][0])
+        self.assertTrue(
+            'INSERT INTO permanent_bounces' in cursor.execute.call_args_list[6][0][0])
+        self.assertTrue(
+            'INSERT INTO permanent_bounces' in cursor.execute.call_args_list[7][0][0])
 
         # schliesslich werden die beiden permanenten ins Dateisystem geschrieben
         self.assertEqual([
-            mock.call('/tmp/permanent_bounced_emails/pe/permanent1@domain.de.gz', 'wb'),
+            mock.call(
+                '/tmp/permanent_bounced_emails/pe/permanent1@domain.de.gz', 'wb'),
             mock.call('/tmp/permanent_bounced_emails/pe/permanent2@domain.de.gz', 'wb')],
             gzip.open.call_args_list)

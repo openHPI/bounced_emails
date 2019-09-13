@@ -8,6 +8,18 @@ setup(
     description='This service detects bounced emails',
     author='matthias wiesner',
     packages=find_packages(exclude='tests'),
+    install_requires=[
+        "PyYaml",
+        "Click",
+        "pika",
+        "flufl.bounce",
+        "validate_email",
+        "tldextract",
+        "requests",
+        "cachecontrol",
+        "uritemplate",
+        "mock"
+    ],
     entry_points={
         'console_scripts': [
             'bouncedemails=bounced_email_service.service:main'

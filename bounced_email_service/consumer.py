@@ -18,7 +18,7 @@ class Consumer(object):
             pprint(obj)
 
     def _callback(self, ch, method, properties, body):
-        ch.basic_ack(delivery_tag = method.delivery_tag)
+        ch.basic_ack(delivery_tag=method.delivery_tag)
         try:
             self.handler.handle_message(body)
         except BouncedEmailException as e:
@@ -31,7 +31,8 @@ class Consumer(object):
         self.connection = pika.BlockingConnection(params)
 
         channel = self.connection.channel()
-        channel.basic_consume(self._callback, queue=self.amqp_config['queue'])
+        channel.basic_consume(
+            queue=self.amqp_config['queue'], on_message_callback=self._callback)
         channel.start_consuming()
 
     def stop(self):

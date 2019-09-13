@@ -11,9 +11,9 @@ class BouncedEmailSettings(object):
         self.env = env
         self.debug = debug
         self.project_root = os.path.dirname(os.path.abspath(__file__))
-        self.config = yaml.load(
+        self.config = yaml.safe_load(
             open(os.path.join(self.project_root, 'config.yml')).read())
-        
+
         self.setup_logging()
 
     def setup_logging(self):
@@ -84,6 +84,7 @@ def run(ctx):
         consumer.run()
     except KeyboardInterrupt:
         consumer.stop()
+
 
 def main():
     cli(obj={})

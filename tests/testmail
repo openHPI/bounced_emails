@@ -1,0 +1,139 @@
+From MAILER-DAEMON  Fri Jan 11 17:17:41 2019
+Return-Path: <>
+X-Original-To: no-reply@openhpi-services.hpi.uni-potsdam.de
+Delivered-To: no-reply@openhpi-services.hpi.uni-potsdam.de
+Received: from mail4.hpi.uni-potsdam.de (unknown [141.89.225.112])
+	by openhpi-services.hpi.uni-potsdam.de (Postfix) with ESMTP id 9353C4036DF
+	for <no-reply@openhpi-services.hpi.uni-potsdam.de>; Fri, 11 Jan 2019 17:17:41 +0100 (CET)
+Received: by mail4.hpi.uni-potsdam.de (Postfix, from userid 1001)
+	id 8F296E00BF; Fri, 11 Jan 2019 17:17:41 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on
+	mail4.hpi.uni-potsdam.de
+X-Spam-Flag: YES
+X-Spam-Level: ***
+X-Spam-Status: Yes, score=3.3 required=3.0 tests=APP_DEVELOPMENT_NORDNS,
+	HTML_MESSAGE,RDNS_NONE autolearn=disabled version=3.4.2
+X-Spam-Report: 
+	*  0.0 HTML_MESSAGE BODY: HTML included in message
+	*  2.0 APP_DEVELOPMENT_NORDNS App development pitch, no rDNS
+	*  1.3 RDNS_NONE Delivered to internal network by a host with no rDNS
+X-Spam-Flag2: YES
+X-Spam-Status2: Yes, score=3.3 required=3.0 tests=APP_DEVELOPMENT_NORDNS,
+	HTML_MESSAGE,RDNS_NONE autolearn=disabled version=3.4.2
+Received: from mail2de.some-provider.com (unknown [91.207.162.248])
+	by mail4.hpi.uni-potsdam.de (Postfix) with ESMTPS id 96FD5DFD29
+	for <no-reply@mydomain.de>; Fri, 11 Jan 2019 17:17:40 +0100 (CET)
+Received: by mail2de.some-provider.com (Postfix)
+	id 58498820A2; Fri, 11 Jan 2019 17:17:40 +0100 (CET)
+Date: Fri, 11 Jan 2019 17:17:40 +0100 (CET)
+From: MAILER-DAEMON@mail2de.some-provider.com (Mail Delivery System)
+Subject: Undelivered Mail Returned to Sender
+To: no-reply@mydomain.de
+Auto-Submitted: auto-replied
+MIME-Version: 1.0
+Content-Type: multipart/report; report-type=delivery-status;
+	boundary="4AB528258D.1547223460/mail2de.some-provider.com"
+Message-Id: <20190111161740.58498820A2@mail2de.some-provider.com>
+
+This is a MIME-encapsulated message.
+
+--4AB528258D.1547223460/mail2de.some-provider.com
+Content-Description: Notification
+Content-Type: text/plain; charset=us-ascii
+
+This is the mail system at host mail2de.some-provider.com.
+
+I'm sorry to have to inform you that your message could not
+be delivered to one or more recipients. It's attached below.
+
+For further assistance, please send mail to postmaster.
+
+If you do so, please include this problem report. You can
+delete your own text from the attached returned message.
+
+                   The mail system
+
+<evil-address@some-provider.com>: host 10.120.100.30[10.120.100.30] said: 550 5.5.0
+    no such recipient - evil-address@some-provider.com (in reply to RCPT TO command)
+
+--4AB528258D.1547223460/mail2de.some-provider.com
+Content-Description: Delivery report
+Content-Type: message/delivery-status
+
+Reporting-MTA: dns; mail2de.some-provider.com
+X-Postfix-Queue-ID: 4AB528258D
+X-Postfix-Sender: rfc822; no-reply@mydomain.de
+Arrival-Date: Fri, 11 Jan 2019 17:17:40 +0100 (CET)
+
+Final-Recipient: rfc822; evil-address@some-provider.com
+Original-Recipient: rfc822;evil-address@some-provider.com
+Action: failed
+Status: 5.5.0
+Remote-MTA: dns; 10.120.100.30
+Diagnostic-Code: smtp; 550 5.5.0 no such recipient - evil-address@some-provider.com
+
+--4AB528258D.1547223460/mail2de.some-provider.com
+Content-Description: Undelivered Message
+Content-Type: message/rfc822
+
+Return-Path: <no-reply@mydomain.de>
+Received: by mail2de.some-provider.com (Postfix, from userid 1001)
+	id 4AB528258D; Fri, 11 Jan 2019 17:17:40 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on mail2de.some-provider.com
+X-Spam-Report: 
+	*  1.0 KAM_LAZY_DOMAIN_SECURITY Sending domain does not have any
+	*      anti-forgery methods
+	*  0.8 KAM_INFOUSMEBIZ Prevalent use of .info|.us|.me|.me.uk|.biz
+	*      domains in spam/malware
+	*  0.5 KAM_NOCONFIDENCE Confidential information sent with no security
+X-Spam-BL-Results: 
+Authentication-Results: mail1de.kle.tt; spf=none (no SPF record) smtp.mailfrom=opensap.info (client-ip=141.89.225.112; helo=mail4.hpi.uni-potsdam.de; envelope-from=no-reply@mydomain.de; receiver=evil-address@some-provider.com)
+Received: from mail4.hpi.uni-potsdam.de (mail4.hpi.uni-potsdam.de [141.89.225.112])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client did not present a certificate)
+	by mail2de.some-provider.com (Postfix) with ESMTPS id B65CF81536
+	for <evil-address@some-provider.com>; Fri, 11 Jan 2019 17:17:38 +0100 (CET)
+Received: from openhpi-services.hpi.uni-potsdam.de (unknown [172.16.64.80])
+	by mail4.hpi.uni-potsdam.de (Postfix) with ESMTP id 24264DFFA5
+	for <evil-address@some-provider.com>; Fri, 11 Jan 2019 17:17:37 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=opensap.info; s=2017;
+	t=1547223457; bh=+p3W2mKo73f+K1E4LPOeDqykDhRWBuc1QXGOsAjr7ZE=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=ZODX3sgxHREJ9JgJx+C9x6W7451HVH2xAS2E2gzuVomlKH1H5XWkvaNYyydQRH9Z8
+	 gPMWZcO+Q/gw5EYumKQYK5m7WS7+1ZFURC74X6hQMspHqZVtulf+N3NkWjvKCILalP
+	 xVVvlOxRx5uueBbH2z0owHmIv9x91Qa1meAVo7LJ0h7Km/iiBIEbGHmGKfkEL/Bv1V
+	 8XU4wlCQW2ZEJU0wun6UPe1mQcRMfsvwd6UJnPiyjQYaMfTBmG9Bt/jytYR0b+BPuK
+	 9AxGBboBcVWri2ARVYMJ9wL7t0qi+YY1jptU7Aew5fkDjZRjr5QuKklSQuuumIccaQ
+	 RArg81vrdyPLg==
+Received: from localhost.localdomain (services-7.open.sap.com [10.210.0.137])
+	by openhpi-services.hpi.uni-potsdam.de (Postfix) with ESMTP id 1D3C24036E7
+	for <evil-address@some-provider.com>; Fri, 11 Jan 2019 17:17:37 +0100 (CET)
+Date: Fri, 11 Jan 2019 16:17:37 +0000
+From: openSAP <no-reply@mydomain.de>
+To: evil-address@some-provider.com
+Message-ID: <5c38c1a118132_2652125656014474711@opensap-srv-2582.mail>
+Subject: xyz
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_5c38c1a039289_26521256560144746e5";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Precedence: bulk
+Auto-Submitted: auto-generated
+
+
+----==_mimepart_5c38c1a039289_26521256560144746e5
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+
+----==_mimepart_5c38c1a039289_26521256560144746e5
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+
+----==_mimepart_5c38c1a039289_26521256560144746e5--
+
+--4AB528258D.1547223460/mail2de.some-provider.com--
