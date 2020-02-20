@@ -2,7 +2,7 @@
 import pika
 import logging
 from pprint import pprint
-from bounced_email_service.handler import BouncedEmailException
+from handler import BouncedEmailException
 
 logger = logging.getLogger('bouncedemails')
 

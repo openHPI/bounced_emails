@@ -5,8 +5,8 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 
 class S(BaseHTTPRequestHandler):
-    def _set_headers(self):
-        self.send_response(200)
+    def _set_headers(self, status=200):
+        self.send_response(status)
         self.send_header('Content-type', 'application/json; charset=utf-8')
         self.end_headers()
 
@@ -20,12 +20,19 @@ class S(BaseHTTPRequestHandler):
 
     def do_HEAD(self):
         self._set_headers()
-        
+
     def do_POST(self):
-        self._set_headers()
-        email = self.path.split('/')[2]
-        self.wfile.write(bytes(json.dumps({
-            'processd_email': unquote(email)}), 'utf8'))
+        status = 200
+        try:
+            email = self.path.split('/')[2]
+            msg = bytes(json.dumps(
+                {'processd_email': unquote(email)}), 'utf-8')
+        except Exception as e:
+            status = 405
+            msg = bytes(json.dumps(str(e)), 'utf-8')
+
+        self._set_headers(status)
+        self.wfile.write(msg)
 
 
 def run(server_class=HTTPServer, handler_class=S, port=7001):
@@ -34,6 +41,7 @@ def run(server_class=HTTPServer, handler_class=S, port=7001):
 
     print('Starting httpd...')
     httpd.serve_forever()
+
 
 if __name__ == "__main__":
     from sys import argv

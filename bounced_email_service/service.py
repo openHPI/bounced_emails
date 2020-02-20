@@ -42,7 +42,7 @@ def cli(ctx, env, debug):
 @click.pass_context
 def set_permanent_bounced_address(ctx, bounced_address, domain):
     """Set an email address as permanent failure"""
-    from bounced_email_service.handler import Handler
+    from handler import Handler
 
     handler = Handler(ctx.obj)
     handler.set_permanent_bounced_address(bounced_address, domain)
@@ -53,7 +53,7 @@ def set_permanent_bounced_address(ctx, bounced_address, domain):
 @click.pass_context
 def find_address(ctx, address):
     """Find an email address within permanent or temporary bounced emails"""
-    from bounced_email_service.handler import Handler
+    from handler import Handler
 
     handler = Handler(ctx.obj)
     handler.find_address(address)
@@ -63,7 +63,7 @@ def find_address(ctx, address):
 @click.pass_context
 def stdin(ctx):
     """Get email for Bounced Email Service from stdin"""
-    from bounced_email_service.handler import Handler
+    from handler import Handler
 
     lines = sys.stdin.readlines()
     body = "".join(lines).strip().encode('utf-8')
@@ -75,8 +75,8 @@ def stdin(ctx):
 @click.pass_context
 def run(ctx):
     """Run Bounced Email Service"""
-    from bounced_email_service.handler import Handler
-    from bounced_email_service.consumer import Consumer
+    from handler import Handler
+    from consumer import Consumer
 
     try:
         handler = Handler(ctx.obj)
@@ -86,5 +86,5 @@ def run(ctx):
         consumer.stop()
 
 
-def main():
+if __name__ == '__main__':
     cli(obj={})

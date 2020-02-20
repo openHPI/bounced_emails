@@ -4,9 +4,12 @@ After=multi-user.target
 
 [Service]
 Type=idle
+User=bouncedemails
+Group=bouncedemails
+WorkingDirectory={bounced_emails_path}
 Environment=LC_ALL=C.UTF-8
 Environment=LANG=C.UTF-8
-ExecStart=/usr/local/bin/bouncedemails run
+ExecStart=/usr/local/bin/pipenv run python3 {bounced_emails_path}/bounced_email_service/service.py run
 Restart=always
 RestartSec=3
 

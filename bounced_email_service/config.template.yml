@@ -1,12 +1,12 @@
 ---
 develop:
   handler:
-    dbfile: /tmp/bounced_emails.db
-    permanent_bounced_emails_path: /tmp/permanent_bounced_emails
+    dbfile: {bounced_emails_path}/bounced_emails.db
+    permanent_bounced_emails_path: {bounced_emails_path}/bounced_emails
     temporary_threshold: 3
     domains:
       mydomain.de:
-        base_url: http://localhost:7001
+        base_url: http://localhost:7001/emails/{address}/suspend
   amqp:
-    url: amqp://mwiesner:geheim@localhost/%2fbouncedemails
+    url: amqp://{uservar}:{passvar}@localhost/%2fbouncedemails
     queue: bouncedemails

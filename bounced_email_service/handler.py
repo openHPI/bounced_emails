@@ -19,7 +19,8 @@ from validate_email import validate_email
 logger = logging.getLogger('bouncedemails')
 
 
-class BouncedEmailException(Exception): pass
+class BouncedEmailException(Exception):
+    pass
 
 
 class Handler(object):
@@ -73,7 +74,8 @@ class Handler(object):
                     WHERE bounced_address=:bounced_address AND domain=:domain),
                 0) + 1);
         '''
-        cur.execute(stmt.strip(), {'bounced_address': bounced_address, 'domain': domain})
+        cur.execute(stmt.strip(), {
+                    'bounced_address': bounced_address, 'domain': domain})
         con.commit()
 
         cur.close()
@@ -86,7 +88,8 @@ class Handler(object):
         SELECT counter FROM temporary_bounces
             WHERE bounced_address=:bounced_address AND domain=:domain;
         '''
-        cur.execute(stmt.strip(), {'bounced_address': bounced_address, 'domain': domain})
+        cur.execute(stmt.strip(), {
+                    'bounced_address': bounced_address, 'domain': domain})
         row = cur.fetchone()
         result = 0
         if row:
@@ -117,7 +120,6 @@ class Handler(object):
         con.close()
         return permanent_bounces, temporary_bounces
 
-
     def _reset_bounced_address(self, bounced_address, domain):
         con = self._get_db_conn()
         cur = con.cursor()
@@ -125,7 +127,8 @@ class Handler(object):
         DELETE FROM temporary_bounces
             WHERE bounced_address=:bounced_address AND domain=:domain;
         '''
-        cur.execute(stmt.strip(), {'bounced_address': bounced_address, 'domain': domain})
+        cur.execute(stmt.strip(), {
+                    'bounced_address': bounced_address, 'domain': domain})
         con.commit()
 
         cur.close()
@@ -152,7 +155,8 @@ class Handler(object):
         '''
         return the domains to which the origin email was sent
         '''
-        to_addresses = [address for _, address in [parseaddr(x.strip()) for x in msg['To'].split(",")]]
+        to_addresses = [address for _, address in [
+            parseaddr(x.strip()) for x in msg['To'].split(",")]]
         domains = []
         for a in to_addresses:
             parts = tldextract.extract(a.split("@")[1])
@@ -180,29 +184,43 @@ class Handler(object):
 
     def _handle_temporary_bounced_address(self, bounced_address, domain, body):
         temporary_threshold = self.handler_config['temporary_threshold']
-        current_counter = self._get_bounced_address_counter(bounced_address, domain)
+        current_counter = self._get_bounced_address_counter(
+            bounced_address, domain)
 
         if current_counter > temporary_threshold:
-            self._handle_permanent_bounced_address(bounced_address, domain, body)
+            self._handle_permanent_bounced_address(
+                bounced_address, domain, body)
             self._reset_bounced_address(bounced_address, domain)
             return
 
         self._increase_bounced_address_counter(bounced_address, domain)
 
-    def _handle_permanent_bounced_address(self, bounced_address, domain, body):
-        config = self.handler_config['domains'][domain]
+    def _default_url_resolver(self, bounced_address, config):
+        tpl = URITemplate(config['base_url'])
+        return tpl.expand(address=bounced_address)
 
+    def _xikolo_url_resolver(self, bounced_address, config):
         response = self.cached_session.get(config['base_url'])
         uri = response.json()['email_suspensions_url']
         tpl = URITemplate(uri)
-        endpoint = tpl.expand(address=bounced_address)
+        return tpl.expand(address=bounced_address)
 
-        logger.debug("Post request to: %s for address: %s", endpoint, bounced_address)
+    def _handle_permanent_bounced_address(self, bounced_address, domain, body):
+        config = self.handler_config['domains'][domain]
+
+        if 'url_resolver' in config and config['url_resolver'] == 'xikolo':
+            endpoint = self._xikolo_url_resolver(bounced_address, config)
+        else:
+            endpoint = self._default_url_resolver(bounced_address, config)
+
+        logger.debug("Post request to: %s for address: %s",
+                     endpoint, bounced_address)
 
         response = self.cached_session.post(endpoint, data={})
         logger.info("Response (%s): %s ", response.status_code, response.text)
 
-        self._set_permanent_bounced_address(bounced_address, domain, response.status_code)
+        self._set_permanent_bounced_address(
+            bounced_address, domain, response.status_code)
         self._store_permanent_bounced_email(bounced_address, body)
 
     def set_permanent_bounced_address(self, bounced_address, domain):
@@ -222,7 +240,7 @@ class Handler(object):
         logger.debug('> Permanent bounces for address: "{0}"'.format(address))
         for entry in permanent_bounces:
             logger.debug(entry)
-        
+
         logger.debug('> Temporary bounces for address: "{0}"'.format(address))
         for entry in temporary_bounces:
             logger.debug(entry)
@@ -266,8 +284,10 @@ class Handler(object):
             if bounced_address in permanent:
                 continue
             logger.info("Temporary: %s", bounced_address)
-            self._handle_temporary_bounced_address(bounced_address, domain, body)
+            self._handle_temporary_bounced_address(
+                bounced_address, domain, body)
 
         for bounced_address in permanent:
             logger.info("Permanent: %s", bounced_address)
-            self._handle_permanent_bounced_address(bounced_address, domain, body)
+            self._handle_permanent_bounced_address(
+                bounced_address, domain, body)
