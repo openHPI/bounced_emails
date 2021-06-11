@@ -16,7 +16,7 @@ handles messages accordingly.
 
 ```bash
 #!/bin/bash
-exec amqp-publish -u amqp://<rabbitmq-user>:<rabbitmq-password>@<rabbitmq-server>/%2fbouncedemails -r "bouncedemails"
+exec amqp-publish -u amqp://<rabbitmq-user>:<rabbitmq-password>@<rabbitmq-server>/bouncedemails -r "bouncedemails"
 ```
 
 - __Bounced Email Service__ consumes the message queue. The message handler
