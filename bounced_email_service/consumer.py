@@ -31,6 +31,7 @@ class Consumer(object):
         self.connection = pika.BlockingConnection(params)
 
         channel = self.connection.channel()
+        channel.queue_declare(queue=self.amqp_config['queue'])
         channel.basic_consume(
             queue=self.amqp_config['queue'], on_message_callback=self._callback)
         channel.start_consuming()
