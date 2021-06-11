@@ -42,54 +42,30 @@ The `base_url` endpoint MUST include `{address}` as an URL part. E.g.
 
 ## Install
 
-As prerequisite you have to have installed: `git` and `make`.
+As prerequisite you have to have installed: `python3, python3-pip, rabbitmq-server`.
+Further you have to have installed `pipenv`.
 
-Change to a proper directory. e.g. `/opt`. `git clone` this repository
-and change to the new directory.
+### Rabbitmq-Server
+- Create a vhost `bouncedemails`
+- Create a user (e.g. bouncedemails) with password, with all permissions to the new created vhost
 
-Set the rabbitmq credentials as environment variables:  
-```bash
-export RABBITMQ_USER=xyz
-export RABBITMQ_PASSWD=abc
-```
-These credentials will be used to configure rabbitmq-server and write the
-`bounced_email_service/config.template.yml` during the install process.
-Type as root `make install`. This will install all necessary packages, configure
-rabbitmq-server, install and configure the service and all dependencies. During
-the install process an user will be created with this curren directory as home
-directory. The python dependencies will be installed by pipenv in a user's local
-virtualenv.
-
-Before running the __Bounced Email Service__ you have to copy the
-`bounced_email_service/config.template.yml` to
+### Service
+- run `pipenv install`
+- copy `bounced_email_service/config.template.yml` to
 `bounced_email_service/config.yml` and adjust the values for production stage.
+- fill the credentials in `bounced_email_service/config.yml`
 
-The install routine installs systemd control files for __Bounced_Email_Service__. 
-Control the service with: `systemctl status bouncedemails`. Adjust the the
-configuration in `config.yml` and start the service with: `systemctl start
-bouncedemails`. The logging output is shown by `journalctl -u bouncedemails`.
+Install systemd control file for __Bounced_Email_Service__. In `resources` folder is
+an example for the systemd file. Adjust the values and install the service.
 
-## Update
-
-Change to the cloned repository and run `make update`. This pulls and apply new
-changes. Adjust the the configuration in `config.yml` if needed and restart the
-service with: `make serve`.
-
-## Environment (read this first)
-
-__Bounced Email Service__ starts with `production` environment and disabled
-`debug` mode by default. To start __Bounced Email Service__ in `develop` mode
-you have to ensure that the systemd service is not running. To start the service
-in debug mode, run as `bouncedemails` user in the base directory `pipenv run python3 bounced_email_service/service.py --debug --env develop run`
-
-Ensure that __Bounced Email Service__ can connect to the xikolo-account service.
-`ConnectionError`s are not catched and the services will stop immediately.
-(Although `systemd` tries to restart the __Bounced Email Service__ after 3
-seconds.)
 
 ## Development & Testing
 
-This project can be developed and tested in a linux container. After installing the __Bounced Email Service__ as described above, stop the __Bounced Email Service__ (if running). Start a local webserver by `python3 tests/develop_webserver.py 7001`. In another shell run the service as bouncedemails user in forground by `pipenv run python3 bounced_email_service/service.py --env develop --debug run`. In a 3rd shell send a testmail to rabbitmq-server by `cat tests/testmail | tests/send_mail_to_rabbitmq.sh`. This should give the output:
+Start a local webserver by `python3 tests/develop_webserver.py 7001`. In another shell run the service 
+as bouncedemails user in forground by `pipenv run python3 bounced_email_service/service.py --env develop --debug run`. 
+In a 3rd shell send a testmail to rabbitmq-server by `cat tests/testmail | tests/send_mail_to_rabbitmq.sh`. 
+This should give the output:
+
 ~~~
 root@bouncedemails:~# journalctl -f -u bouncedemails.service
 bouncedemails - ------------- INCOMING MESSAGE -------------
