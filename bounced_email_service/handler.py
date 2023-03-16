@@ -9,6 +9,7 @@ import requests
 import tldextract
 
 from email.utils import parseaddr
+from email.header import decode_header
 from uritemplate import URITemplate
 from flufl.bounce import all_failures
 from cachecontrol import CacheControl
@@ -212,11 +213,10 @@ class Handler(object):
         else:
             endpoint = self._default_url_resolver(bounced_address, config)
 
-        logger.debug("Post request to: %s for address: %s",
-                     endpoint, bounced_address)
+        logger.debug(f'{"Post to:":<11}{endpoint} - {bounced_address}')
 
         response = self.cached_session.post(endpoint, data={})
-        logger.info("Response (%s): %s ", response.status_code, response.text)
+        logger.info(f'{"Response:":<11}{response.status_code}, {response.text}')
 
         self._set_permanent_bounced_address(
             bounced_address, domain, response.status_code)
@@ -226,21 +226,21 @@ class Handler(object):
         '''
         handles manually bounced email addresses
         '''
-        logger.debug("Permanent: %s", bounced_address)
+        logger.debug(f'{"Permanent:":<11}{bounced_address}')
         self._handle_permanent_bounced_address(bounced_address, domain, '')
 
     def find_address(self, address):
         '''
         Find an email address within permanent or temporary bounced emails
         '''
-        logger.debug("Find: %s", address)
+        logger.debug(f'{"Find:":<11}{address}')
         permanent_bounces, temporary_bounces = self._find_address(address)
 
-        logger.debug('> Permanent bounces for address: "{0}"'.format(address))
+        logger.debug(f'> Permanent bounces for address: "{address}"')
         for entry in permanent_bounces:
             logger.debug(entry)
 
-        logger.debug('> Temporary bounces for address: "{0}"'.format(address))
+        logger.debug(f'> Temporary bounces for address: "{address}"')
         for entry in temporary_bounces:
             logger.debug(entry)
 
@@ -252,13 +252,17 @@ class Handler(object):
         logger.info("------------- INCOMING MESSAGE -------------")
         for key, value in msg.items():
             if any(key.startswith(h) for h in ['From', 'To', 'Subject']):
-                logger.info("%s:\t%s", key, value)
+                key += ':'
+                decoded_header = decode_header(value)[0]
+                if decoded_header[1]:
+                    value = decoded_header[0].decode(decoded_header[1])
+                logger.info(f'{key:<11}{value}')
 
         for domain in self._get_origin_to_domains(msg):
             if domain in self.handler_config['domains'].keys():
                 break
         else:
-            raise BouncedEmailException("Domain '%s' not found" % domain)
+            raise BouncedEmailException(f"Domain '{domain}' not found")
 
         t, p = all_failures(msg)
 
@@ -276,7 +280,7 @@ class Handler(object):
         if not (temporary or permanent):
             return self._handle_out_of_office_message(msg)
 
-        logger.info("Domain: %s", domain)
+        logger.info(f'{"Domain:":<11}{domain}')
 
         for bounced_address in temporary:
             # sometimes a temporary failure is a permanent failure as well (strange, but yes)
