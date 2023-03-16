@@ -2,6 +2,7 @@ import logging
 import asyncore
 import traceback
 from smtpd import SMTPServer
+from handler import BouncedEmailException
 
 
 logger = logging.getLogger()
@@ -19,10 +20,13 @@ class EmailServer(SMTPServer):
     def run(self):
         asyncore.loop()
 
-    def process_message(self, peer, mailfrom, rcpttos, data, **kwargs):
+    def process_message(self, peer, mailfrom, rcpttos, mail, **kwargs):
         try:
             for handler in self.handler:
-                handler.handle_message(data)
+                try:
+                    handler.handle_message(mail)
+                except BouncedEmailException as e:
+                    logger.error('An exception occured: %s', e)
         except:
             tb = traceback.format_exc()
             logger.error(tb)
