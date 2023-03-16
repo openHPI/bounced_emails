@@ -17,10 +17,10 @@ class Consumer(object):
         if self.settings.debug:
             pprint(obj)
 
-    def _callback(self, ch, method, properties, body):
+    def _callback(self, ch, method, properties, mail):
         ch.basic_ack(delivery_tag=method.delivery_tag)
         try:
-            self.handler.handle_message(body)
+            self.handler.handle_message(mail)
         except BouncedEmailException as e:
             logger.error('An exception occured: %s', e)
 

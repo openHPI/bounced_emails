@@ -66,9 +66,28 @@ def stdin(ctx):
     from handler import Handler
 
     lines = sys.stdin.readlines()
-    body = "".join(lines).strip().encode('utf-8')
+    mail = "".join(lines).strip().encode('utf-8')
     handler = Handler(ctx.obj)
-    handler.handle_message(body)
+    handler.handle_message(mail)
+
+
+@cli.command()
+@click.pass_context
+@click.option('--port', default=2525, help='port')
+@click.option('--host', default='0.0.0.0', help='host')
+def run_smtpserver(ctx, port, host):
+    """ Run LTI Provider - email_encryption SMTPServer"""
+    try:
+        from handler import Handler
+        from smtpserver import EmailServer
+
+        handler = Handler(ctx.obj)
+        smtpserver = EmailServer((host, port), None)
+        smtpserver.set_config(ctx.obj)
+        smtpserver.register_handler(handler)
+        smtpserver.run()
+    except KeyboardInterrupt:
+        smtpserver.handle_stop()
 
 
 @cli.command()

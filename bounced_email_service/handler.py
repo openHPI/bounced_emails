@@ -8,7 +8,6 @@ import sqlite3
 import requests
 import tldextract
 
-from datetime import datetime
 from email.utils import parseaddr
 from uritemplate import URITemplate
 from flufl.bounce import all_failures
@@ -163,8 +162,8 @@ class Handler(object):
             domains.append("%s.%s" % (parts[-2], parts[-1]))
         return domains
 
-    def _store_permanent_bounced_email(self, bounced_address, body):
-        if not ('permanent_bounced_emails_path' in self.handler_config and body):
+    def _store_permanent_bounced_email(self, bounced_address, mail):
+        if not ('permanent_bounced_emails_path' in self.handler_config):
             return
 
         dir_path = os.path.join(
@@ -175,21 +174,21 @@ class Handler(object):
             os.makedirs(dir_path)
 
         path = os.path.join(dir_path, bounced_address + '.gz')
-        content = bytes(body)
+        content = bytes(mail)
         with gzip.open(path, 'wb') as f:
             f.write(content)
 
     def _handle_out_of_office_message(self, msg):
         pass
 
-    def _handle_temporary_bounced_address(self, bounced_address, domain, body):
+    def _handle_temporary_bounced_address(self, bounced_address, domain, mail):
         temporary_threshold = self.handler_config['temporary_threshold']
         current_counter = self._get_bounced_address_counter(
             bounced_address, domain)
 
         if current_counter > temporary_threshold:
             self._handle_permanent_bounced_address(
-                bounced_address, domain, body)
+                bounced_address, domain, mail)
             self._reset_bounced_address(bounced_address, domain)
             return
 
@@ -205,7 +204,7 @@ class Handler(object):
         tpl = URITemplate(uri)
         return tpl.expand(address=bounced_address)
 
-    def _handle_permanent_bounced_address(self, bounced_address, domain, body):
+    def _handle_permanent_bounced_address(self, bounced_address, domain, mail):
         config = self.handler_config['domains'][domain]
 
         if 'url_resolver' in config and config['url_resolver'] == 'xikolo':
@@ -221,7 +220,7 @@ class Handler(object):
 
         self._set_permanent_bounced_address(
             bounced_address, domain, response.status_code)
-        self._store_permanent_bounced_email(bounced_address, body)
+        self._store_permanent_bounced_email(bounced_address, mail)
 
     def set_permanent_bounced_address(self, bounced_address, domain):
         '''
@@ -245,11 +244,11 @@ class Handler(object):
         for entry in temporary_bounces:
             logger.debug(entry)
 
-    def handle_message(self, body):
+    def handle_message(self, mail):
         '''
         handles soft and hard bounced emails
         '''
-        msg = email.message_from_bytes(bytes(body))
+        msg = email.message_from_bytes(bytes(mail))
         logger.info("------------- INCOMING MESSAGE -------------")
         for key, value in msg.items():
             if any(key.startswith(h) for h in ['From', 'To', 'Subject']):
@@ -285,9 +284,9 @@ class Handler(object):
                 continue
             logger.info("Temporary: %s", bounced_address)
             self._handle_temporary_bounced_address(
-                bounced_address, domain, body)
+                bounced_address, domain, mail)
 
         for bounced_address in permanent:
             logger.info("Permanent: %s", bounced_address)
             self._handle_permanent_bounced_address(
-                bounced_address, domain, body)
+                bounced_address, domain, mail)
