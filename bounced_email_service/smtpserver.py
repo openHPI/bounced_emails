@@ -5,7 +5,7 @@ from smtpd import SMTPServer
 from handler import BouncedEmailException
 
 
-logger = logging.getLogger()
+logger = logging.getLogger('bouncedemails')
 
 
 class EmailServer(SMTPServer):
