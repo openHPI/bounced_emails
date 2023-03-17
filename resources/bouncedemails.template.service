@@ -1,17 +1,15 @@
 [Unit]
-Description=Bounced Email Service
-After=multi-user.target
+Description=Bounced Emails
+Documentation=https://github.com/openHPI/bounced_emails
+After=network.target
+Wants=bouncedemails-run.service bouncedemails-smtp.service
 
 [Service]
-Type=idle
-User=bouncedemails
-Group=bouncedemails
+Type=oneshot
+SyslogIdentifier=bouncedemails
 WorkingDirectory={bounced_emails_path}
-Environment=LC_ALL=C.UTF-8
-Environment=LANG=C.UTF-8
-ExecStart=/usr/local/bin/pipenv run python3 {bounced_emails_path}/bounced_email_service/service.py run
-Restart=always
-RestartSec=3
+ExecStart=/bin/true
+RemainAfterExit=yes
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target

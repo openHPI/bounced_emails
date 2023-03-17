@@ -5,7 +5,7 @@ failures and _permanent_ failures (also called as _soft_ and _hard_ bounces) and
 handles messages accordingly.
 
 ## How it works
-- The undeliverable emails are forwarded from the HPI mailservers to the postfix
+- The undeliverable emails (bounced emails) are forwarded from the HPI mailservers to the postfix
   mailserver on our router (`router-{a,b}.oob.xopic.de`).
 - The mailserver is configured to send the bounced emails to an amqp message
   queue running on the __Bounced Email Service__.
@@ -18,6 +18,16 @@ handles messages accordingly.
 #!/bin/bash
 exec amqp-publish -u amqp://<rabbitmq-user>:<rabbitmq-password>@<rabbitmq-server>/bouncedemails -r "bouncedemails"
 ```
+### Edit
+A SMTP server has been added to the __Bounced Email Service__. This means that
+bounced emails can now be forwarded directly to the bouncedemails virtual
+machine. However, the SMPT server can only be started on a high port (default:
+2525). Therefore the sending HPI mailservers (mail4 and mail5) have to be
+configured to this port. However, this requires that the HPI mailservers can
+reach the bouncedemails virtual machine. If the HPI mail servers cannot be
+configured to the high port, it is recommended to establish a corresponding
+`simpleproxy` service.
+
 
 - __Bounced Email Service__ consumes the message queue. The message handler
   separates the incoming bounced email and handles them accordingly:
@@ -30,7 +40,8 @@ exec amqp-publish -u amqp://<rabbitmq-user>:<rabbitmq-password>@<rabbitmq-server
   - _Permanent_ failure: The accused email address in the bounced email is
     reported to the xikolo-account service. The xikolo-account service disables
     all notifications regarding this email address.
-  
+
+
 ### Handling permanent failures
 If the __Bounced Email Service__ detects a permanent failure, then the
 responsible plattform will be informed. The plattform is determined by the
@@ -55,9 +66,9 @@ Further you have to have installed `pipenv`.
 `bounced_email_service/config.yml` and adjust the values for production stage.
 - fill the credentials in `bounced_email_service/config.yml`
 
-Install systemd control file for __Bounced_Email_Service__. In `resources` folder is
-an example for the systemd file. Adjust the values and install the service.
-
+Install the systemd control files for __Bounced_Email_Service__. In the
+`resources` folder are examples for the systemd files. Adjust the values and
+install the services.
 
 ## Development & Testing
 
