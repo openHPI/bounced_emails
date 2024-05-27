@@ -90,20 +90,5 @@ def run_smtpserver(ctx, port, host):
         smtpserver.handle_stop()
 
 
-@cli.command()
-@click.pass_context
-def run(ctx):
-    """Run Bounced Email Service"""
-    from handler import Handler
-    from consumer import Consumer
-
-    try:
-        handler = Handler(ctx.obj)
-        consumer = Consumer(ctx.obj, handler)
-        consumer.run()
-    except KeyboardInterrupt:
-        consumer.stop()
-
-
 if __name__ == '__main__':
     cli(obj={})

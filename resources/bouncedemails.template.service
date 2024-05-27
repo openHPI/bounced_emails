@@ -2,7 +2,7 @@
 Description=Bounced Emails
 Documentation=https://github.com/openHPI/bounced_emails
 After=network.target
-Wants=bouncedemails-run.service bouncedemails-smtp.service
+Wants=bouncedemails-smtp.service
 
 [Service]
 Type=oneshot
