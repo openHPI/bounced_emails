@@ -17,6 +17,7 @@ requests = "*"
 cachecontrol = "*"
 uritemplate = "*"
 mock = "*"
+systemd-python = "*"
 
 [requires]
 python_version = "3.8"
