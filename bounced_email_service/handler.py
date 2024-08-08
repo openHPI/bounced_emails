@@ -159,8 +159,8 @@ class Handler(object):
             parseaddr(x.strip()) for x in msg['To'].split(",")]]
         domains = []
         for a in to_addresses:
-            parts = tldextract.extract(a.split("@")[1])
-            domains.append("%s.%s" % (parts[-2], parts[-1]))
+            extractResult = tldextract.extract(a.split("@")[1])
+            domains.append(extractResult.registered_domain)
         return domains
 
     def _store_permanent_bounced_email(self, bounced_address, mail):
