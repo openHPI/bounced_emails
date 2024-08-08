@@ -20,7 +20,7 @@ def smtptest(filepath):
         print('---')
         print('Journallog entries')
         j = journal.Reader()
-        j.seek_realtime(datetime.now() - timedelta(seconds=2))
+        j.seek_realtime(datetime.now() - timedelta(seconds=10))
         for entry in j:
             print(entry["MESSAGE"])
 
