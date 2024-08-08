@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 @click.command()
 @click.option('--filepath', default='./testmail', help='Filepath to bounced email')
-def test(filepath):
+def smtptest(filepath):
     with open(filepath) as f:
         message = f.read()
 
@@ -20,12 +20,12 @@ def test(filepath):
         print('---')
         print('Journallog entries')
         j = journal.Reader()
-        j.seek_realtime(datetime.now() - timedelta(minutes=1))
+        j.seek_realtime(datetime.now() - timedelta(seconds=2))
         for entry in j:
             print(entry["MESSAGE"])
 
     except smtplib.SMTPException as e:
         print('SMTP error occurred: ' + str(e))
 
-if __name__ == 'main':
-    test()
+if __name__ == '__main__':
+    smtptest()
