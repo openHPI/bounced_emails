@@ -1,12 +1,12 @@
 import click
 import smtplib
 from systemd import journal
-from datetime import datetime, timedelta
 
 
 @click.command()
-@click.option('--filepath', default='./testmail', help='Filepath to bounced email')
-def smtptest(filepath):
+@click.option('-f', '--filepath', default='./testmail', help='Filepath to bounced email')
+@click.option('-l', '--lines', default=8, help='Seek the last x lines from journal')
+def smtptest(filepath, lines):
     with open(filepath) as f:
         message = f.read()
 
@@ -20,9 +20,16 @@ def smtptest(filepath):
         print('---')
         print('Journallog entries')
         j = journal.Reader()
-        j.seek_realtime(datetime.now() - timedelta(seconds=10))
-        for entry in j:
-            print(entry["MESSAGE"])
+        j.seek_tail()
+        entries = []
+
+        i = 1
+        while i <= lines:
+            entries.append(j.get_previous())
+            i += 1
+
+        for e in reversed(entries):
+            print(e['MESSAGE'])
 
     except smtplib.SMTPException as e:
         print('SMTP error occurred: ' + str(e))
