@@ -7,6 +7,3 @@ develop:
     domains:
       mydomain.de:
         base_url: http://localhost:7001/emails/{address}/suspend
-  amqp:
-    url: amqp://{uservar}:{passvar}@localhost/%2fbouncedemails
-    queue: bouncedemails
