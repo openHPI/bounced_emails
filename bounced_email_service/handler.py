@@ -180,7 +180,7 @@ class Handler(object):
             f.write(content)
 
     def _handle_out_of_office_message(self, msg):
-        pass
+        logger.info(f'{"No action:":<11}out of office message')
 
     def _handle_temporary_bounced_address(self, bounced_address, domain, mail):
         temporary_threshold = self.handler_config['temporary_threshold']
