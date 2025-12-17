@@ -200,7 +200,12 @@ class Handler(object):
         return tpl.expand(address=bounced_address)
 
     def _xikolo_url_resolver(self, bounced_address, config):
-        response = self.cached_session.get(config['base_url'])
+        headers = {}
+        if 'auth' in config:
+            if 'token' in config['auth']:
+                headers["Authorization"] = f"Bearer {config['auth']['token']}"
+
+        response = self.cached_session.get(config['base_url'], headers=headers)
         uri = response.json()['email_suspensions_url']
         tpl = URITemplate(uri)
         return tpl.expand(address=bounced_address)
@@ -213,9 +218,14 @@ class Handler(object):
         else:
             endpoint = self._default_url_resolver(bounced_address, config)
 
+        headers = {}
+        if 'auth' in config:
+            if 'token' in config['auth']:
+                headers["Authorization"] = f"Bearer {config['auth']['token']}"
+
         logger.debug(f'{"Post to:":<11}{endpoint} - {bounced_address}')
 
-        response = self.cached_session.post(endpoint, data={})
+        response = self.cached_session.post(endpoint, headers=headers)
         logger.info(f'{"Response:":<11}{response.status_code}, {response.text}')
 
         self._set_permanent_bounced_address(
